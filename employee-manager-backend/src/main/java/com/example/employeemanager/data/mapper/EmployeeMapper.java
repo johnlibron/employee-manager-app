@@ -14,11 +14,11 @@ import java.util.List;
 public interface EmployeeMapper {
     EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);
 
-    EmployeeDto toEmployeeDto(Employee employee);
+    EmployeeDto toDto(Employee employee);
 
-    Employee toEmployee(EmployeeIncomingDto employeeIncomingDto);
+    Employee toModel(EmployeeIncomingDto employeeIncomingDto);
 
-    List<EmployeeDto> toEmployeeDtoList(List<Employee> employees);
+    List<EmployeeDto> toDtoList(List<Employee> employees);
 
     @Mappings({
         @Mapping(source = "employee.id", target = "id"),
@@ -29,5 +29,5 @@ public interface EmployeeMapper {
         @Mapping(source = "employeeIncomingDto.imageUrl", target = "imageUrl"),
         @Mapping(source = "employee.employeeCode", target = "employeeCode")
     })
-    Employee toEmployee(EmployeeIncomingDto employeeIncomingDto, Employee employee);
+    Employee toModel(EmployeeIncomingDto employeeIncomingDto, Employee employee);
 }

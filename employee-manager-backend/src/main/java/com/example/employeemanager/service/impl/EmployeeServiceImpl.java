@@ -23,16 +23,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @Override
     public EmployeeDto addEmployee(EmployeeIncomingDto employeeIncomingDto) {
-        Employee employee = EmployeeMapper.INSTANCE.toEmployee(employeeIncomingDto);
+        Employee employee = EmployeeMapper.INSTANCE.toModel(employeeIncomingDto);
         employee.setEmployeeCode(UUID.randomUUID().toString());
         Employee addedEmployee = employeeRepository.save(employee);
-        return EmployeeMapper.INSTANCE.toEmployeeDto(addedEmployee);
+        return EmployeeMapper.INSTANCE.toDto(addedEmployee);
     }
 
     @Override
     public List<EmployeeDto> findAllEmployees() {
         List<Employee> employees = employeeRepository.findAll();
-        return EmployeeMapper.INSTANCE.toEmployeeDtoList(employees);
+        return EmployeeMapper.INSTANCE.toDtoList(employees);
     }
 
     @Transactional
@@ -42,9 +42,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (optionalEmployee.isEmpty()) {
             return Optional.empty();
         }
-        Employee employee = EmployeeMapper.INSTANCE.toEmployee(employeeIncomingDto, optionalEmployee.get());
+        Employee employee = EmployeeMapper.INSTANCE.toModel(employeeIncomingDto, optionalEmployee.get());
         Employee updatedEmployee = employeeRepository.save(employee);
-        EmployeeDto employeeDto = EmployeeMapper.INSTANCE.toEmployeeDto(updatedEmployee);
+        EmployeeDto employeeDto = EmployeeMapper.INSTANCE.toDto(updatedEmployee);
         return Optional.of(employeeDto);
     }
 
@@ -55,7 +55,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (optionalEmployee.isEmpty()) {
             return Optional.empty();
         }
-        EmployeeDto employeeDto = EmployeeMapper.INSTANCE.toEmployeeDto(optionalEmployee.get());
+        EmployeeDto employeeDto = EmployeeMapper.INSTANCE.toDto(optionalEmployee.get());
         return Optional.of(employeeDto);
     }
 
