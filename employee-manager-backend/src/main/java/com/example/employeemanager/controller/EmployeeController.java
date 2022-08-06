@@ -2,11 +2,8 @@ package com.example.employeemanager.controller;
 
 import com.example.employeemanager.data.dto.EmployeeDto;
 import com.example.employeemanager.data.dto.EmployeeIncomingDto;
-import com.example.employeemanager.data.mapper.EmployeeMapper;
-import com.example.employeemanager.data.model.Employee;
 import com.example.employeemanager.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,53 +28,45 @@ public class EmployeeController {
 
     @GetMapping
     public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
-        List<Employee> employees = employeeService.findAllEmployees();
+        List<EmployeeDto> employees = employeeService.findAllEmployees();
         if (employees.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        List<EmployeeDto> list = EmployeeMapper.INSTANCE.convert(employees);
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return new ResponseEntity<>(employees, HttpStatus.OK);
     }
 
     @GetMapping("{employeeId}")
     public ResponseEntity<EmployeeDto> getEmployee(@PathVariable("employeeId") Long id) {
-        Optional<Employee> employee = employeeService.findEmployee(id);
+        final Optional<EmployeeDto> employee = employeeService.findEmployee(id);
         if (employee.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        EmployeeDto employeeDto = EmployeeMapper.INSTANCE.convert(employee.get());
-        return new ResponseEntity<>(employeeDto, HttpStatus.OK);
+        return new ResponseEntity<>(employee.get(), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<EmployeeDto> addEmployee(@Valid @RequestBody EmployeeIncomingDto employeeIncomingDto) {
-        Employee employee = EmployeeMapper.INSTANCE.convert(employeeIncomingDto);
-        Employee addedEmployee = employeeService.addEmployee(employee);
-        EmployeeDto employeeDto = EmployeeMapper.INSTANCE.convert(addedEmployee);
-        return new ResponseEntity<>(employeeDto, HttpStatus.CREATED);
+        final EmployeeDto addedEmployee = employeeService.addEmployee(employeeIncomingDto);
+        return new ResponseEntity<>(addedEmployee, HttpStatus.CREATED);
     }
 
     @PutMapping("{employeeId}")
     public ResponseEntity<EmployeeDto> updateEmployee(
             @PathVariable("employeeId") Long id,
             @Valid @RequestBody EmployeeIncomingDto employeeIncomingDto) {
-        Optional<Employee> optionalEmployee = employeeService.findEmployee(id);
-        if (optionalEmployee.isEmpty()) {
+        final Optional<EmployeeDto> updatedEmployee = employeeService.updateEmployee(id, employeeIncomingDto);
+        if (updatedEmployee.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        Employee employee = EmployeeMapper.INSTANCE.convert(employeeIncomingDto, optionalEmployee.get());
-        Employee updatedEmployee = employeeService.updateEmployee(employee);
-        EmployeeDto employeeDto = EmployeeMapper.INSTANCE.convert(updatedEmployee);
-        return new ResponseEntity<>(employeeDto, HttpStatus.OK);
+        return new ResponseEntity<>(updatedEmployee.get(), HttpStatus.OK);
     }
 
     @DeleteMapping("{employeeId}")
-    public ResponseEntity<?> updateEmployee(@PathVariable("employeeId") Long id) {
-        Optional<Employee> employee = employeeService.findEmployee(id);
-        if (employee.isEmpty()) {
+    public ResponseEntity<?> deleteEmployee(@PathVariable("employeeId") Long id) {
+        final Optional<Long> deletedEmployee = employeeService.deleteEmployee(id);
+        if (deletedEmployee.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        employeeService.deleteEmployee(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
