@@ -2,10 +2,10 @@ package com.example.employeemanager.controller;
 
 import com.example.employeemanager.data.dto.EmployeeDto;
 import com.example.employeemanager.data.dto.EmployeeIncomingDto;
+import com.example.employeemanager.data.mapper.EmployeeMapper;
 import com.example.employeemanager.data.model.Employee;
 import com.example.employeemanager.service.EmployeeService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,21 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/employees")
 public class EmployeeController {
 
-    private final ModelMapper modelMapper;
-
     private final EmployeeService employeeService;
-
-    @Autowired
-    public EmployeeController(EmployeeService employeeService, ModelMapper modelMapper) {
-        this.employeeService = employeeService;
-        this.modelMapper = modelMapper;
-    }
 
     @GetMapping
     public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
@@ -43,10 +35,7 @@ public class EmployeeController {
         if (employees.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        List<EmployeeDto> list = employees
-                .stream()
-                .map(employee -> modelMapper.map(employee, EmployeeDto.class))
-                .collect(Collectors.toList());
+        List<EmployeeDto> list = EmployeeMapper.INSTANCE.convert(employees);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
@@ -56,15 +45,15 @@ public class EmployeeController {
         if (employee.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        EmployeeDto employeeDto = modelMapper.map(employee, EmployeeDto.class);
+        EmployeeDto employeeDto = EmployeeMapper.INSTANCE.convert(employee.get());
         return new ResponseEntity<>(employeeDto, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<EmployeeDto> addEmployee(@Valid @RequestBody EmployeeIncomingDto employeeIncomingDto) {
-        Employee employee = modelMapper.map(employeeIncomingDto, Employee.class);
+        Employee employee = EmployeeMapper.INSTANCE.convert(employeeIncomingDto);
         Employee addedEmployee = employeeService.addEmployee(employee);
-        EmployeeDto employeeDto = modelMapper.map(addedEmployee, EmployeeDto.class);
+        EmployeeDto employeeDto = EmployeeMapper.INSTANCE.convert(addedEmployee);
         return new ResponseEntity<>(employeeDto, HttpStatus.CREATED);
     }
 
@@ -76,9 +65,9 @@ public class EmployeeController {
         if (optionalEmployee.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        BeanUtils.copyProperties(employeeIncomingDto, optionalEmployee.get());
-        Employee updatedEmployee = employeeService.updateEmployee(optionalEmployee.get());
-        EmployeeDto employeeDto = modelMapper.map(updatedEmployee, EmployeeDto.class);
+        Employee employee = EmployeeMapper.INSTANCE.convert(employeeIncomingDto, optionalEmployee.get());
+        Employee updatedEmployee = employeeService.updateEmployee(employee);
+        EmployeeDto employeeDto = EmployeeMapper.INSTANCE.convert(updatedEmployee);
         return new ResponseEntity<>(employeeDto, HttpStatus.OK);
     }
 
