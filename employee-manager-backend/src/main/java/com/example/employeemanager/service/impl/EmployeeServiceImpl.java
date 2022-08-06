@@ -9,6 +9,7 @@ import com.example.employeemanager.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
 
+    @Transactional
     @Override
     public EmployeeDto addEmployee(EmployeeIncomingDto employeeIncomingDto) {
         Employee employee = EmployeeMapper.INSTANCE.toEmployee(employeeIncomingDto);
@@ -33,6 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return EmployeeMapper.INSTANCE.toEmployeeDtoList(employees);
     }
 
+    @Transactional
     @Override
     public Optional<EmployeeDto> updateEmployee(Long id, EmployeeIncomingDto employeeIncomingDto) {
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
@@ -56,6 +59,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return Optional.of(employeeDto);
     }
 
+    @Transactional
     @Override
     public Optional<Long> deleteEmployee(Long id) {
         Optional<Employee> optionalEmployee = employeeRepository.findById(id);
