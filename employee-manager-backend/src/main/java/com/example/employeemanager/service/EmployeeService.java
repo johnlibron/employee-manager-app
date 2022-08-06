@@ -1,39 +1,20 @@
 package com.example.employeemanager.service;
 
-import com.example.employeemanager.data.model.Employee;
-import com.example.employeemanager.data.dao.EmployeeRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.example.employeemanager.data.dto.EmployeeDto;
+import com.example.employeemanager.data.dto.EmployeeIncomingDto;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-@RequiredArgsConstructor
-@Service
-public class EmployeeService {
-    private final EmployeeRepository employeeRepository;
+public interface EmployeeService {
 
-    public Employee addEmployee(Employee employee) {
-        employee.setEmployeeCode(UUID.randomUUID().toString());
-        return employeeRepository.save(employee);
-    }
+    EmployeeDto addEmployee(EmployeeIncomingDto employeeIncomingDto);
 
-    public List<Employee> findAllEmployees() {
-        return employeeRepository.findAll();
-    }
+    List<EmployeeDto> findAllEmployees();
 
-    public Employee updateEmployee(Employee employee) {
-        return employeeRepository.save(employee);
-    }
+    Optional<EmployeeDto> updateEmployee(Long id, EmployeeIncomingDto employeeIncomingDto);
 
-    public Optional<Employee> findEmployee(Long id) {
-//        return employeeRepository.findById(id)
-//                .orElseThrow(() -> new UserNotFoundException("User by id " + id + " was not found"));
-        return employeeRepository.findById(id);
-    }
+    Optional<EmployeeDto> findEmployee(Long id);
 
-    public void deleteEmployee(Long id) {
-        employeeRepository.deleteById(id);
-    }
+    Optional<Long> deleteEmployee(Long id);
 }
